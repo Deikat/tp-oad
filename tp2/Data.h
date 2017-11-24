@@ -25,7 +25,11 @@ public:
 	int get_nb_jobs() const;
 	int get_nb_machines() const;
 	Operation& get_operation(int id_op);
+	Operation& get_op_from_jid(int jid);
+	Operation& get_op_from_mid(int mid);
 	string to_string();
+
+	int evaluer(vector<int> v_bierwirth);
 };
 
 #endif

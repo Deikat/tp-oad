@@ -13,13 +13,21 @@ private:
 	int id_job;
 	int id_machine;
 	int duree;
-	int position_sequence;
+	int seq_pos; // ?
 
 public:
-	Operation(int id, int id_job, int id_machine, int duree, int position_sequence);
+	int index;
+	int start;
+	int end;
+	int prev;
+
+	Operation(int id, int id_job, int id_machine, int duree, int seq_pos);
 	~Operation();
-	int get_id_machine();
+	int get_jid();
+	int get_mid();
 	int get_duree();
+	void set_seq_pos(int new_seq_pos);
+	string to_string();
 };
 
 #endif

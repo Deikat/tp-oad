@@ -16,6 +16,8 @@ public:
 	Job(int id);
 	~Job();
 	void add_operation(int id_op);
+	int get_sequence(int sid);
+	string to_string();
 };
 
 #endif

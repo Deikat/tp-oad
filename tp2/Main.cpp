@@ -9,10 +9,22 @@
 using namespace std;
 
 
-int main(int argc, char * argv[])
+int main(int, char *[])
 {
-	Data data("data/INSTANCES/la01.dat");
-	cout << data.to_string() << endl;
+	Data data("data/graphe_exemple.txt");
+
+	vector<int> v;
+	v.push_back(1);
+	v.push_back(0);
+	v.push_back(0);
+	v.push_back(0);
+	v.push_back(2);
+	v.push_back(1);
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(2);
+
+	cout << data.evaluer(v) << endl;
 
 	return 0;
 }
