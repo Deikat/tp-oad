@@ -4,6 +4,7 @@
 Operation::Operation(int id, int id_job, int id_machine, int duree, int seq_pos)
 	: id(id), id_job(id_job), id_machine(id_machine), duree(duree), seq_pos(seq_pos)
 {
+	prev = -1;
 }
 
 Operation::~Operation()

@@ -101,7 +101,7 @@ string Data::to_string()
 	return ss.str();
 }
 
-int Data::evaluer(vector<int> v_bierwirth)
+int Data::evaluer(vector<int> v_bierwirth, vector<Operation>& chemin_critique)
 {
 	int makespan = 0;
 
@@ -117,54 +117,89 @@ int Data::evaluer(vector<int> v_bierwirth)
 		last_op_mach.push_back(-1);
 	}
 
+	Operation& last_op = operations[0];
 	for (int i = 0; i < (signed) v_bierwirth.size(); i++)
 	{
-		cout << "i=" << i << endl;
 		int jid = v_bierwirth[i];
-		cout << "jid=" << jid << endl;
 
 		int sid = nb_op_job[jid];
-		cout << "sid=" << sid << endl;
-		cout << jobs[jid].to_string() << endl;
 		int oid = jobs[jid].get_sequence(sid);
-		cout << "oid=" << oid << endl;
 		Operation op = operations[oid];
-		cout << "op=" << op.to_string() << endl;
 
 		int prev_jid = (sid == 0) ? -1 : jobs[jid].get_sequence(sid - 1);
-		cout << "prev_jid=" << prev_jid << endl;
 		int stop_prev_jid = (prev_jid == -1) ? 0 : get_op_from_jid(prev_jid).get_duree();
-		cout << "stop_prev_jid=" << stop_prev_jid << endl;
-
-		cout << "last_op_mach=|";
-		for (int i : last_op_mach)
-		{
-			cout << i << "|";
-		}
-		cout << endl;
 
 		int prev_mid = last_op_mach[op.get_mid()];
-		cout << "prev_mid=" << prev_mid << endl;
 		int stop_prev_mid = (prev_mid == -1) ? 0 : get_op_from_mid(prev_mid).get_duree();
-		cout << "stop_prev_mid=" << stop_prev_mid << endl;
 
 		op.index = i;
-		cout << "op.index=" << op.index << endl;
 		op.start = (stop_prev_jid > stop_prev_mid) ? stop_prev_jid : stop_prev_mid;
-		cout << "op.start=" << op.start << endl;
 		op.end = op.start + op.get_duree();
-		cout << "op.end=" << op.end << endl;
 
 		if (op.end > makespan)
+		{
 			makespan = op.end;
+			last_op = op;
+		}
 
 		op.prev = (op.start == stop_prev_jid) ? prev_jid : prev_mid;
-		cout << "op.prev=" << op.prev << endl;
 		++nb_op_job[jid];
 		last_op_mach[op.get_mid()] = oid;
+	}
 
-		cout << "makespan=" << makespan << endl << endl;
+	while (last_op.prev != -1)
+	{
+		chemin_critique.push_back(last_op);
+		last_op = operations[last_op.prev];
 	}
 
 	return makespan;
+}
+
+vector<int> Data::recherche_locale(vector<int> v_bierwirth, int n_max)
+{
+	vector<Operation> chemin_critique;
+	int makespan = evaluer(v_bierwirth, chemin_critique);
+
+	int n = 0;
+	int i = 0;
+	int j = 1;
+
+	while (j < (signed) chemin_critique.size()-1 && n < n_max)
+	{
+		// si on est sur un arc disjonctif
+		if (chemin_critique[i].get_jid() != chemin_critique[j].get_jid())
+		{
+			vector<int> v_bis = v_bierwirth;
+
+			Operation& op_i = chemin_critique[i];
+			Operation& op_j = chemin_critique[j];
+
+			int tmp = v_bierwirth[op_i.index];
+			v_bierwirth[op_i.index] = v_bis[op_j.index];
+			v_bis[op_j.index] = tmp;
+
+			vector<Operation> chemin_critique_bis;
+			int makespan_bis = evaluer(v_bis, chemin_critique_bis);
+
+			if (makespan_bis < makespan)
+			{
+				i = 0;
+				j = 1;
+				v_bierwirth = v_bis;
+				chemin_critique = chemin_critique_bis;
+			}
+			else
+			{
+				i = j++;
+			}
+		}
+		else
+		{
+			i = j++;
+		}
+		n++;
+	}
+
+	return v_bierwirth;
 }

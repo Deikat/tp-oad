@@ -29,7 +29,8 @@ public:
 	Operation& get_op_from_mid(int mid);
 	string to_string();
 
-	int evaluer(vector<int> v_bierwirth);
+	int evaluer(vector<int> v_bierwirth, vector<Operation>& chemin_critique);
+	vector<int> recherche_locale(vector<int> v_bierwirth, int n_max);
 };
 
 #endif

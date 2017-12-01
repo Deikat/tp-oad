@@ -8,11 +8,10 @@ using namespace std;
 
 class Job
 {
-private :
+public:
 	int id;
 	vector<int> sequence;
 
-public:
 	Job(int id);
 	~Job();
 	void add_operation(int id_op);
