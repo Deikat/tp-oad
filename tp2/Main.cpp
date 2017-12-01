@@ -24,11 +24,10 @@ int main(int, char *[])
 	v_bierwirth.push_back(2);
 	v_bierwirth.push_back(2);
 
-	vector<Operation> chemin_critique;
-	data.evaluer(v_bierwirth, chemin_critique);
+	vector<int> v = data.multistart(10);
 
 	cout << "VecteurBierwirth<";
-	for (int i : v_bierwirth)
+	for (int i : v)
 	{
 		cout << i << "|";
 	}

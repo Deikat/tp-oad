@@ -18,6 +18,8 @@ private:
 	vector<Operation> operations;
 	vector<Job> jobs;
 
+	vector<vector<int>> duplicates;
+
 public:
 	Data(const char * filename);
 	~Data();
@@ -30,7 +32,11 @@ public:
 	string to_string();
 
 	int evaluer(vector<int> v_bierwirth, vector<Operation>& chemin_critique);
-	vector<int> recherche_locale(vector<int> v_bierwirth, int n_max);
+	vector<int> recherche_locale(vector<int> v_bierwirth, int n_max, int * makespan);
+	bool tester_double(vector<int> v_bierwirth);
+	vector<int> multistart(int n_max);
 };
+
+int cmp_bierwirth(vector<int> v1, vector<int> v2);
 
 #endif

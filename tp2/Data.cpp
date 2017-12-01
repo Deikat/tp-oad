@@ -1,6 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <algorithm>
+#include <random>
+#include <chrono>
 
 #include "Data.h"
 
@@ -156,10 +159,10 @@ int Data::evaluer(vector<int> v_bierwirth, vector<Operation>& chemin_critique)
 	return makespan;
 }
 
-vector<int> Data::recherche_locale(vector<int> v_bierwirth, int n_max)
+vector<int> Data::recherche_locale(vector<int> v_bierwirth, int n_max, int * makespan)
 {
 	vector<Operation> chemin_critique;
-	int makespan = evaluer(v_bierwirth, chemin_critique);
+	*makespan = evaluer(v_bierwirth, chemin_critique);
 
 	int n = 0;
 	int i = 0;
@@ -182,8 +185,9 @@ vector<int> Data::recherche_locale(vector<int> v_bierwirth, int n_max)
 			vector<Operation> chemin_critique_bis;
 			int makespan_bis = evaluer(v_bis, chemin_critique_bis);
 
-			if (makespan_bis < makespan)
+			if (makespan_bis < *makespan)
 			{
+				*makespan = makespan_bis;
 				i = 0;
 				j = 1;
 				v_bierwirth = v_bis;
@@ -202,4 +206,84 @@ vector<int> Data::recherche_locale(vector<int> v_bierwirth, int n_max)
 	}
 
 	return v_bierwirth;
+}
+
+// recherche par dichotomie
+// retourne true si v_bierwirth existe déjà
+bool Data::tester_double(vector<int> v_bierwirth)
+{
+	int i = 0;
+	int j = duplicates.size() - 1;
+	int k;
+	while (i <= j)
+	{
+		k = (i + j) / 2;
+		switch (cmp_bierwirth(v_bierwirth, duplicates[k]))
+		{
+			case -1:
+				j = k-1;
+			case 1:
+				i = k+1;
+			default:
+				return true;
+		}
+	}
+	duplicates.insert(duplicates.begin() + i, v_bierwirth);
+	return false;
+}
+
+vector<int> Data::multistart(int n_max)
+{
+	duplicates.clear();
+
+	vector<int> v_bierwirth_origin;
+	for (int j = 0; j < nb_jobs; j++)
+	{
+		for (int s : jobs[j].sequence)
+		{
+			v_bierwirth_origin.push_back(j);
+		}
+	}
+
+	int makespan;
+	vector<int> v_bierwirth;
+	vector<int> v_bierwirth_bis;
+
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+
+	for (int n = 0; n < n_max; n++)
+	{
+		do
+		{
+			v_bierwirth_bis = v_bierwirth_origin;
+			shuffle(v_bierwirth_bis.begin(), v_bierwirth_bis.end(), std::default_random_engine(seed));
+		}
+		while (tester_double(v_bierwirth_bis));
+
+		int makespan_bis;
+		v_bierwirth_bis = recherche_locale(v_bierwirth_bis, v_bierwirth_bis.size(), &makespan_bis);
+		if (makespan_bis < makespan)
+		{
+			makespan = makespan_bis;
+			v_bierwirth = v_bierwirth_bis;
+		}
+	}
+
+	return v_bierwirth;
+}
+
+int cmp_bierwirth(vector<int> v1, vector<int> v2)
+{
+	for (int i = 0; i < v1.size(); i++)
+	{
+		if (v1[i] < v2[i])
+		{
+			return -1;
+		}
+		else if (v1[i] > v2[i])
+		{
+			return 1;
+		}
+	}
+	return 0;
 }
