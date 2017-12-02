@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <random>
 #include <chrono>
+#include <limits>
 
 #include "Data.h"
 
@@ -215,24 +216,27 @@ bool Data::tester_double(vector<int> v_bierwirth)
 	int i = 0;
 	int j = duplicates.size() - 1;
 	int k;
-	while (i <= j)
+	while (i < j)
 	{
 		k = (i + j) / 2;
 		switch (cmp_bierwirth(v_bierwirth, duplicates[k]))
 		{
 			case -1:
 				j = k-1;
+				break;
 			case 1:
 				i = k+1;
-			default:
+				break;
+			case 0:
 				return true;
+				break;
 		}
 	}
 	duplicates.insert(duplicates.begin() + i, v_bierwirth);
 	return false;
 }
 
-vector<int> Data::multistart(int n_max)
+vector<int> Data::multistart(int n_max, int * makespan)
 {
 	duplicates.clear();
 
@@ -245,26 +249,26 @@ vector<int> Data::multistart(int n_max)
 		}
 	}
 
-	int makespan;
+	*makespan = std::numeric_limits<int>::max();
 	vector<int> v_bierwirth;
 	vector<int> v_bierwirth_bis;
-
-	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 
 	for (int n = 0; n < n_max; n++)
 	{
 		do
 		{
 			v_bierwirth_bis = v_bierwirth_origin;
+
+			unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
 			shuffle(v_bierwirth_bis.begin(), v_bierwirth_bis.end(), std::default_random_engine(seed));
 		}
 		while (tester_double(v_bierwirth_bis));
 
 		int makespan_bis;
 		v_bierwirth_bis = recherche_locale(v_bierwirth_bis, v_bierwirth_bis.size(), &makespan_bis);
-		if (makespan_bis < makespan)
+		if (makespan_bis < *makespan)
 		{
-			makespan = makespan_bis;
+			*makespan = makespan_bis;
 			v_bierwirth = v_bierwirth_bis;
 		}
 	}

@@ -11,27 +11,22 @@ using namespace std;
 
 int main(int, char *[])
 {
-	Data data("data/graphe_exemple.txt");
-
-	vector<int> v_bierwirth;
-	v_bierwirth.push_back(1);
-	v_bierwirth.push_back(0);
-	v_bierwirth.push_back(0);
-	v_bierwirth.push_back(0);
-	v_bierwirth.push_back(2);
-	v_bierwirth.push_back(1);
-	v_bierwirth.push_back(1);
-	v_bierwirth.push_back(2);
-	v_bierwirth.push_back(2);
-
-	vector<int> v = data.multistart(10);
-
-	cout << "VecteurBierwirth<";
-	for (int i : v)
+	char filename[64];
+	for (int i = 1; i < 41; i++)
 	{
-		cout << i << "|";
-	}
-	cout << ">" << endl;
+		sprintf(filename, "data/INSTANCES/la%02d.dat", 3);
+		Data data(filename);
 
+		int makespan;
+		vector<int> v = data.multistart(1000, &makespan);
+
+		cout << "makespan=" << makespan << " and ";
+		cout << "VecteurBierwirth<";
+		for (int i : v)
+		{
+			cout << i << "|";
+		}
+		cout << ">" << endl;
+	}
 	return 0;
 }

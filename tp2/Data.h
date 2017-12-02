@@ -34,7 +34,7 @@ public:
 	int evaluer(vector<int> v_bierwirth, vector<Operation>& chemin_critique);
 	vector<int> recherche_locale(vector<int> v_bierwirth, int n_max, int * makespan);
 	bool tester_double(vector<int> v_bierwirth);
-	vector<int> multistart(int n_max);
+	vector<int> multistart(int n_max, int * makespan);
 };
 
 int cmp_bierwirth(vector<int> v1, vector<int> v2);
